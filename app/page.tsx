@@ -24,6 +24,7 @@ export default function Home() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [foundEndings, setFoundEndings] = useState<string[]>([]);
+  const [veilKey, setVeilKey] = useState(0);
 
   // Hydrate from localStorage after mount (client-only).
   useEffect(() => {
@@ -44,6 +45,11 @@ export default function Home() {
       setFoundEndings(addFoundEnding(currentNode.endingId));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentNode?.id]);
+
+  // Brief darkness-swallow veil on every scene change.
+  useEffect(() => {
+    setVeilKey((k) => k + 1);
   }, [currentNode?.id]);
 
   if (!gameState || !currentNode) {
@@ -76,6 +82,7 @@ export default function Home() {
 
   return (
     <main className="screen">
+      <div key={veilKey} className="scene-veil" aria-hidden="true" />
       <div className="topbar">
         <p className="game-title">หนึ่งคืนที่หอพัก</p>
         {!ending && <SanityCandles sanity={gameState.sanity} />}

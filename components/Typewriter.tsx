@@ -7,7 +7,16 @@ interface TypewriterProps {
   onDone: () => void;
 }
 
-const MS_PER_CHAR = 18;
+const BASE_MS = 16;
+
+// Human-ish cadence: small per-character jitter, longer breath on punctuation
+// and line breaks, so the typewriter doesn't feel like a metronome.
+function delayAfter(ch: string): number {
+  if (ch === "\n") return 420;
+  if (ch === "." || ch === "!" || ch === "?" || ch === "…") return 260;
+  if (ch === "," || ch === "ๆ") return 140;
+  return BASE_MS + Math.random() * 10;
+}
 
 export default function Typewriter({ text, onDone }: TypewriterProps) {
   const [shown, setShown] = useState("");
@@ -39,9 +48,9 @@ export default function Typewriter({ text, onDone }: TypewriterProps) {
         onDone();
         return;
       }
-      timeoutId = window.setTimeout(tick, MS_PER_CHAR);
+      timeoutId = window.setTimeout(tick, delayAfter(text[i - 1]));
     }
-    timeoutId = window.setTimeout(tick, MS_PER_CHAR);
+    timeoutId = window.setTimeout(tick, BASE_MS);
     return () => window.clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);

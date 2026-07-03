@@ -1,11 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Anuphan } from "next/font/google";
+import { Sarabun, Trirong, Charmonman } from "next/font/google";
 import "./globals.css";
 
-const anuphan = Anuphan({
-  variable: "--font-anuphan",
+const sarabun = Sarabun({
+  variable: "--font-sarabun",
   subsets: ["thai", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600"],
+});
+
+const trirong = Trirong({
+  variable: "--font-trirong",
+  subsets: ["thai", "latin"],
+  weight: ["400", "500", "600"],
+  style: ["italic", "normal"],
+});
+
+const charmonman = Charmonman({
+  variable: "--font-charmonman",
+  subsets: ["thai", "latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -20,7 +33,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="th" className={anuphan.variable}>
+    <html lang="th" className={`${sarabun.variable} ${trirong.variable} ${charmonman.variable}`}>
       <head>
         <script
           defer
