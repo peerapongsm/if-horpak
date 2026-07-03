@@ -15,8 +15,6 @@ export interface ValidationIssue {
   message: string;
 }
 
-const CANONICAL_ENDING_IDS = ["death", "flee", "survive_unaware", "true_ending", "ghost_twist"] as const;
-
 function findDuplicateIds(story: StoryData): ValidationIssue[] {
   const seen = new Set<string>();
   const issues: ValidationIssue[] = [];
@@ -107,12 +105,16 @@ function findNonEndingDeadEnds(story: StoryData): ValidationIssue[] {
   return issues;
 }
 
-function findUnreachableEndings(story: StoryData, reachable: Set<string>): ValidationIssue[] {
+function findUnreachableEndings(
+  story: StoryData,
+  reachable: Set<string>,
+  expectedEndingIds: readonly string[],
+): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const reachableEndingIds = new Set(
     story.nodes.filter((n) => n.isEnding && reachable.has(n.id)).map((n) => n.endingId),
   );
-  for (const endingId of CANONICAL_ENDING_IDS) {
+  for (const endingId of expectedEndingIds) {
     if (!reachableEndingIds.has(endingId)) {
       issues.push({ rule: "ending-unreachable", message: `Ending "${endingId}" is not reachable from start` });
     }
@@ -147,7 +149,7 @@ function findUnsettableRequiredFlags(story: StoryData): ValidationIssue[] {
   return issues;
 }
 
-export function validateStory(story: StoryData): ValidationIssue[] {
+export function validateStory(story: StoryData, expectedEndingIds: readonly string[]): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
   if (!story.nodes.some((n) => n.id === story.start)) {
@@ -161,14 +163,14 @@ export function validateStory(story: StoryData): ValidationIssue[] {
   const reachable = reachableNodeIds(story);
   issues.push(...findUnreachableNodes(story, reachable));
   issues.push(...findNonEndingDeadEnds(story));
-  issues.push(...findUnreachableEndings(story, reachable));
+  issues.push(...findUnreachableEndings(story, reachable, expectedEndingIds));
   issues.push(...findUnsettableRequiredFlags(story));
 
   return issues;
 }
 
-export function isStoryValid(story: StoryData): boolean {
-  return validateStory(story).length === 0;
+export function isStoryValid(story: StoryData, expectedEndingIds: readonly string[]): boolean {
+  return validateStory(story, expectedEndingIds).length === 0;
 }
 
 export type { StoryData, StoryNode };

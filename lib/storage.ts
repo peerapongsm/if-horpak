@@ -1,13 +1,20 @@
-// localStorage persistence: autosave of the current run + the set of endings ever found.
+// localStorage persistence: autosave of the current run + the set of endings
+// ever found, kept per story. The original single-story keys are preserved as
+// the "horpak" story's keys so pre-multi-story players lose nothing.
 
 import type { GameState } from "./engine";
 
-const SAVE_KEY = "if-horpak:save";
-const ENDINGS_KEY = "if-horpak:endings-found";
+function saveKey(storySlug: string): string {
+  return storySlug === "horpak" ? "if-horpak:save" : `if-horpak:${storySlug}:save`;
+}
 
-export function loadSave(): GameState | null {
+function endingsKey(storySlug: string): string {
+  return storySlug === "horpak" ? "if-horpak:endings-found" : `if-horpak:${storySlug}:endings-found`;
+}
+
+export function loadSave(storySlug: string): GameState | null {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(saveKey(storySlug));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (
@@ -26,17 +33,17 @@ export function loadSave(): GameState | null {
   }
 }
 
-export function saveGame(state: GameState): void {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+export function saveGame(storySlug: string, state: GameState): void {
+  localStorage.setItem(saveKey(storySlug), JSON.stringify(state));
 }
 
-export function clearSave(): void {
-  localStorage.removeItem(SAVE_KEY);
+export function clearSave(storySlug: string): void {
+  localStorage.removeItem(saveKey(storySlug));
 }
 
-export function loadFoundEndings(): string[] {
+export function loadFoundEndings(storySlug: string): string[] {
   try {
-    const raw = localStorage.getItem(ENDINGS_KEY);
+    const raw = localStorage.getItem(endingsKey(storySlug));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -46,10 +53,10 @@ export function loadFoundEndings(): string[] {
   }
 }
 
-export function addFoundEnding(endingId: string): string[] {
-  const existing = loadFoundEndings();
+export function addFoundEnding(storySlug: string, endingId: string): string[] {
+  const existing = loadFoundEndings(storySlug);
   if (existing.includes(endingId)) return existing;
   const next = [...existing, endingId];
-  localStorage.setItem(ENDINGS_KEY, JSON.stringify(next));
+  localStorage.setItem(endingsKey(storySlug), JSON.stringify(next));
   return next;
 }

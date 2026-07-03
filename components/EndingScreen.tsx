@@ -1,14 +1,23 @@
-import { ENDINGS_META } from "@/lib/endingsMeta";
+import type { EndingMeta } from "@/lib/endingsMeta";
 
 interface EndingScreenProps {
   endingId: string;
   endingText: string;
+  endings: EndingMeta[];
   foundEndings: string[];
   onRestart: () => void;
+  onBackToStories: () => void;
 }
 
-export default function EndingScreen({ endingId, endingText, foundEndings, onRestart }: EndingScreenProps) {
-  const currentMeta = ENDINGS_META.find((e) => e.id === endingId);
+export default function EndingScreen({
+  endingId,
+  endingText,
+  endings,
+  foundEndings,
+  onRestart,
+  onBackToStories,
+}: EndingScreenProps) {
+  const currentMeta = endings.find((e) => e.id === endingId);
 
   return (
     <div className="ending-screen">
@@ -21,10 +30,10 @@ export default function EndingScreen({ endingId, endingText, foundEndings, onRes
 
       <div className="ending-collection">
         <p className="ending-collection-label">
-          คุณพบ {foundEndings.length}/{ENDINGS_META.length} endings
+          คุณพบ {foundEndings.length}/{endings.length} endings
         </p>
         <ul className="ending-collection-list">
-          {ENDINGS_META.map((meta) => {
+          {endings.map((meta) => {
             const found = foundEndings.includes(meta.id);
             const label = found ? meta.title : meta.secret ? "???" : meta.title;
             return (
@@ -38,6 +47,9 @@ export default function EndingScreen({ endingId, endingText, foundEndings, onRes
 
       <button type="button" className="choice-btn primary-btn" onClick={onRestart}>
         เล่นอีกครั้ง
+      </button>
+      <button type="button" className="choice-btn" onClick={onBackToStories}>
+        เลือกเรื่องอื่น
       </button>
     </div>
   );

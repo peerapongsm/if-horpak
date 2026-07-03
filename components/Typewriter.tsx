@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TEXT_SPEED_MULTIPLIERS, type TextSpeed } from "@/lib/settings";
 
 interface TypewriterProps {
   text: string;
+  speed: TextSpeed;
   onDone: () => void;
 }
 
@@ -11,16 +13,20 @@ const BASE_MS = 16;
 
 // Human-ish cadence: small per-character jitter, longer breath on punctuation
 // and line breaks, so the typewriter doesn't feel like a metronome.
-function delayAfter(ch: string): number {
-  if (ch === "\n") return 420;
-  if (ch === "." || ch === "!" || ch === "?" || ch === "…") return 260;
-  if (ch === "," || ch === "ๆ") return 140;
-  return BASE_MS + Math.random() * 10;
+function delayAfter(ch: string, multiplier: number): number {
+  if (ch === "\n") return 420 * multiplier;
+  if (ch === "." || ch === "!" || ch === "?" || ch === "…") return 260 * multiplier;
+  if (ch === "," || ch === "ๆ") return 140 * multiplier;
+  return (BASE_MS + Math.random() * 10) * multiplier;
 }
 
-export default function Typewriter({ text, onDone }: TypewriterProps) {
+export default function Typewriter({ text, speed, onDone }: TypewriterProps) {
   const [shown, setShown] = useState("");
   const doneRef = useRef(false);
+  // Speed changes mid-scene take effect on the next character without
+  // restarting the reveal, so it lives in a ref, not the effect deps.
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
 
   useEffect(() => {
     doneRef.current = false;
@@ -30,7 +36,7 @@ export default function Typewriter({ text, onDone }: TypewriterProps) {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (prefersReduced) {
+    if (prefersReduced || TEXT_SPEED_MULTIPLIERS[speedRef.current] === 0) {
       setShown(text);
       doneRef.current = true;
       onDone();
@@ -41,6 +47,13 @@ export default function Typewriter({ text, onDone }: TypewriterProps) {
     let timeoutId: number;
 
     function tick() {
+      const multiplier = TEXT_SPEED_MULTIPLIERS[speedRef.current];
+      if (multiplier === 0) {
+        setShown(text);
+        doneRef.current = true;
+        onDone();
+        return;
+      }
       i++;
       setShown(text.slice(0, i));
       if (i >= text.length) {
@@ -48,7 +61,7 @@ export default function Typewriter({ text, onDone }: TypewriterProps) {
         onDone();
         return;
       }
-      timeoutId = window.setTimeout(tick, delayAfter(text[i - 1]));
+      timeoutId = window.setTimeout(tick, delayAfter(text[i - 1], multiplier));
     }
     timeoutId = window.setTimeout(tick, BASE_MS);
     return () => window.clearTimeout(timeoutId);
