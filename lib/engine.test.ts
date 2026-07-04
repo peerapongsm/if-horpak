@@ -1,37 +1,21 @@
 import { describe, it, expect } from "vitest";
 import {
-  initState,
-  applyChoice,
-  isChoiceAvailable,
-  availableChoices,
-  getNode,
-  isEndingNode,
-  type StoryData,
+  initState, applyChoice, isChoiceAvailable, availableChoices,
+  getNode, isEndingNode, type StoryData,
 } from "./engine";
 
 const story: StoryData = {
+  schemaVersion: 1,
   start: "a",
-  deathBySanityNodeId: "end_death",
+  meter: { label: "สติ", max: 3, floor: 0, floorNodeId: "end_death", viz: "candles" },
   nodes: [
-    {
-      id: "a",
-      text: "node a",
-      choices: [
-        { label: "go to b", goto: "b", sets: { has_key: true } },
-        { label: "go to c, scary", goto: "c", sanityDelta: -2 },
-        { label: "locked choice", goto: "d", requires: { has_key: true } },
-      ],
-    },
-    {
-      id: "b",
-      text: "node b",
-      choices: [{ label: "go to d needs key", goto: "d", requires: { has_key: true } }],
-    },
-    {
-      id: "c",
-      text: "node c",
-      choices: [{ label: "go to end, scary", goto: "end_survive", sanityDelta: -2 }],
-    },
+    { id: "a", text: "node a", choices: [
+      { label: "go to b", goto: "b", sets: { has_key: true } },
+      { label: "go to c, scary", goto: "c", meterDelta: -2 },
+      { label: "locked choice", goto: "d", requires: { has_key: true } },
+    ]},
+    { id: "b", text: "node b", choices: [{ label: "go to d needs key", goto: "d", requires: { has_key: true } }] },
+    { id: "c", text: "node c", choices: [{ label: "go to end, scary", goto: "end_survive", meterDelta: -2 }] },
     { id: "d", text: "node d, ending", isEnding: true, endingId: "true_ending" },
     { id: "end_survive", text: "survived", isEnding: true, endingId: "survive" },
     { id: "end_death", text: "you died", isEnding: true, endingId: "death" },
@@ -39,84 +23,62 @@ const story: StoryData = {
 };
 
 describe("initState", () => {
-  it("starts at the story's start node with full sanity and no flags", () => {
-    const state = initState(story);
-    expect(state.currentNode).toBe("a");
-    expect(state.sanity).toBe(3);
-    expect(state.flags).toEqual({});
+  it("starts at start node with meter at max (default) and no flags", () => {
+    const s = initState(story);
+    expect(s.currentNode).toBe("a");
+    expect(s.meter).toBe(3);
+    expect(s.flags).toEqual({});
+  });
+  it("honors meter.start when set below max", () => {
+    const romance: StoryData = { ...story, meter: { ...story.meter, max: 5, start: 2 } };
+    expect(initState(romance).meter).toBe(2);
   });
 });
 
-describe("isChoiceAvailable / availableChoices", () => {
-  it("hides choices whose requires aren't met yet", () => {
-    const state = initState(story);
-    const node = getNode(story, "a");
-    const choices = availableChoices(node, state.flags);
-    expect(choices.map((c) => c.label)).toEqual(["go to b", "go to c, scary"]);
-    expect(isChoiceAvailable(node.choices![2], state.flags)).toBe(false);
+describe("availableChoices", () => {
+  it("hides choices whose requires aren't met", () => {
+    const s = initState(story);
+    expect(availableChoices(getNode(story, "a"), s.flags).map((c) => c.label))
+      .toEqual(["go to b", "go to c, scary"]);
   });
-
-  it("reveals choices once the required flag is set", () => {
-    const state = initState(story);
-    const { state: afterB } = applyChoice(story, state, getNode(story, "a").choices![0]);
-    expect(afterB.flags.has_key).toBe(true);
-    const nodeB = getNode(story, "b");
-    expect(availableChoices(nodeB, afterB.flags).map((c) => c.label)).toEqual(["go to d needs key"]);
-  });
-
-  it("supports requiring a flag to be explicitly false", () => {
-    const flags = { seen_ghost: false };
-    const choice = { label: "x", goto: "y", requires: { seen_ghost: false } };
-    expect(isChoiceAvailable(choice, flags)).toBe(true);
-    expect(isChoiceAvailable(choice, { seen_ghost: true })).toBe(false);
+  it("supports requiring a flag explicitly false", () => {
+    const choice = { label: "x", goto: "y", requires: { seen: false } };
+    expect(isChoiceAvailable(choice, { seen: false })).toBe(true);
+    expect(isChoiceAvailable(choice, { seen: true })).toBe(false);
   });
 });
 
 describe("applyChoice: goto/sets", () => {
-  it("moves to the goto node and merges sets into flags", () => {
-    const state = initState(story);
-    const { state: next } = applyChoice(story, state, getNode(story, "a").choices![0]);
-    expect(next.currentNode).toBe("b");
-    expect(next.flags).toEqual({ has_key: true });
+  it("moves to goto and merges sets", () => {
+    const { state } = applyChoice(story, initState(story), getNode(story, "a").choices![0]);
+    expect(state.currentNode).toBe("b");
+    expect(state.flags).toEqual({ has_key: true });
   });
-
-  it("throws if the choice's requires are not met", () => {
-    const state = initState(story);
-    const lockedChoice = getNode(story, "a").choices![2];
-    expect(() => applyChoice(story, state, lockedChoice)).toThrow();
+  it("throws if requires unmet", () => {
+    expect(() => applyChoice(story, initState(story), getNode(story, "a").choices![2])).toThrow();
   });
 });
 
-describe("applyChoice: sanity", () => {
-  it("clamps sanity to the 0..3 range", () => {
-    const state = initState(story);
-    const { state: afterC } = applyChoice(story, state, getNode(story, "a").choices![1]);
-    expect(afterC.sanity).toBe(1);
-    const { state: afterEnd } = applyChoice(story, afterC, getNode(story, "c").choices![0]);
-    // sanity would go to -1, clamps to 0, and forces death
-    expect(afterEnd.sanity).toBe(0);
+describe("applyChoice: meter", () => {
+  it("clamps meter to floor..max", () => {
+    const { state: c } = applyChoice(story, initState(story), getNode(story, "a").choices![1]);
+    expect(c.meter).toBe(1);
   });
-
-  it("forces the death-by-sanity ending when sanity hits 0, overriding goto", () => {
-    const state = initState(story);
-    const { state: afterC } = applyChoice(story, state, getNode(story, "a").choices![1]); // sanity 1
-    const result = applyChoice(story, afterC, getNode(story, "c").choices![0]); // sanity would be -1
-    expect(result.forcedDeath).toBe(true);
-    expect(result.state.currentNode).toBe("end_death");
-    expect(result.state.sanity).toBe(0);
+  it("forces floorNodeId when meter hits floor, overriding goto", () => {
+    const { state: c } = applyChoice(story, initState(story), getNode(story, "a").choices![1]); // meter 1
+    const r = applyChoice(story, c, getNode(story, "c").choices![0]); // would be -1
+    expect(r.forcedFloor).toBe(true);
+    expect(r.state.currentNode).toBe("end_death");
+    expect(r.state.meter).toBe(0);
   });
-
-  it("does not flag forcedDeath when goto already is the death node", () => {
-    const deathChoice = { label: "give up", goto: "end_death", sanityDelta: -3 };
-    const result = applyChoice(story, initState(story), deathChoice);
-    expect(result.forcedDeath).toBe(false);
-    expect(result.state.currentNode).toBe("end_death");
+  it("does not flag forcedFloor when goto already is the floor node", () => {
+    const r = applyChoice(story, initState(story), { label: "give up", goto: "end_death", meterDelta: -3 });
+    expect(r.forcedFloor).toBe(false);
+    expect(r.state.currentNode).toBe("end_death");
   });
-
-  it("does not exceed max sanity of 3", () => {
-    const healChoice = { label: "rest", goto: "a", sanityDelta: 5 };
-    const result = applyChoice(story, initState(story), healChoice);
-    expect(result.state.sanity).toBe(3);
+  it("does not exceed max", () => {
+    const r = applyChoice(story, initState(story), { label: "heal", goto: "a", meterDelta: 5 });
+    expect(r.state.meter).toBe(3);
   });
 });
 

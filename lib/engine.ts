@@ -1,47 +1,64 @@
-// Engine: pure state machine for the "หนึ่งคืนที่หอพัก" interactive fiction.
-// No I/O, no DOM — just node transitions, flag requires/sets, and the sanity mechanic.
+// Engine: pure state machine for interactive fiction stories.
+// No I/O, no DOM — just node transitions, flag requires/sets, and a named meter mechanic.
 
 export type Flags = Record<string, boolean>;
 
 export interface Choice {
   label: string;
   goto: string;
-  /** Flags that must equal the given boolean for this choice to be offered. */
   requires?: Record<string, boolean>;
-  /** Flags to set (true/false) when this choice is taken. */
   sets?: Record<string, boolean>;
-  /** Change to sanity (-3..+3 typical) when this choice is taken. */
-  sanityDelta?: number;
+  /** Change to the meter (-N..+N) when this choice is taken. */
+  meterDelta?: number;
+}
+
+export interface Chapter {
+  /** Free-text label shown above the bar (e.g. "วันที่ 3", "14:32"). */
+  label: string;
+  /** 1-based position; the bar fills to index/total. */
+  index: number;
+  total: number;
 }
 
 export interface StoryNode {
   id: string;
   text: string;
-  /** True only for terminal nodes. */
   isEnding?: boolean;
-  /** One of the 5 canonical ending ids; only set on ending nodes. */
   endingId?: string;
+  /** Progress marker; rendered as a bar when present. */
+  chapter?: Chapter;
   choices?: Choice[];
 }
 
+export type MeterViz = "candles" | "hearts" | "battery";
+
+export interface Meter {
+  label: string;
+  max: number;
+  /** Starting value; defaults to max when omitted. */
+  start?: number;
+  floor: number;
+  /** Ending node forced when the meter reaches floor. Must be an ending node. */
+  floorNodeId: string;
+  viz: MeterViz;
+  hideBar?: boolean;
+}
+
 export interface StoryData {
+  schemaVersion: 1;
   start: string;
-  /** Node the player is forced into when sanity reaches 0. Must be an ending node. */
-  deathBySanityNodeId: string;
+  meter: Meter;
   nodes: StoryNode[];
 }
 
 export interface GameState {
   currentNode: string;
   flags: Flags;
-  sanity: number;
+  meter: number;
 }
 
-export const MAX_SANITY = 3;
-export const MIN_SANITY = 0;
-
-function clampSanity(value: number): number {
-  return Math.max(MIN_SANITY, Math.min(MAX_SANITY, value));
+export function clampMeter(value: number, story: StoryData): number {
+  return Math.max(story.meter.floor, Math.min(story.meter.max, value));
 }
 
 export function buildNodeIndex(story: StoryData): Map<string, StoryNode> {
@@ -55,13 +72,18 @@ export function getNode(story: StoryData, nodeId: string): StoryNode {
 }
 
 export function initState(story: StoryData): GameState {
-  return { currentNode: story.start, flags: {}, sanity: MAX_SANITY };
+  return {
+    currentNode: story.start,
+    flags: {},
+    meter: story.meter.start ?? story.meter.max,
+  };
 }
 
-/** A choice is offered only if every required flag matches the current state. */
 export function isChoiceAvailable(choice: Choice, flags: Flags): boolean {
   if (!choice.requires) return true;
-  return Object.entries(choice.requires).every(([flag, expected]) => Boolean(flags[flag]) === expected);
+  return Object.entries(choice.requires).every(
+    ([flag, expected]) => Boolean(flags[flag]) === expected,
+  );
 }
 
 export function availableChoices(node: StoryNode, flags: Flags): Choice[] {
@@ -70,33 +92,24 @@ export function availableChoices(node: StoryNode, flags: Flags): Choice[] {
 
 export interface ApplyChoiceResult {
   state: GameState;
-  /** True if sanity hit 0 and the destination was overridden to the death ending. */
-  forcedDeath: boolean;
+  /** True if the meter hit floor and the destination was overridden to floorNodeId. */
+  forcedFloor: boolean;
 }
 
-/**
- * Apply a choice taken from the node the state currently points at.
- * Throws if the choice isn't actually available (requires not met).
- */
 export function applyChoice(story: StoryData, state: GameState, choice: Choice): ApplyChoiceResult {
   if (!isChoiceAvailable(choice, state.flags)) {
     throw new Error(`Choice "${choice.label}" is not available in current state`);
   }
-
   const nextFlags: Flags = { ...state.flags, ...(choice.sets ?? {}) };
-  const nextSanity = clampSanity(state.sanity + (choice.sanityDelta ?? 0));
+  const nextMeter = clampMeter(state.meter + (choice.meterDelta ?? 0), story);
 
   let nextNode = choice.goto;
-  let forcedDeath = false;
-  if (nextSanity <= MIN_SANITY && nextNode !== story.deathBySanityNodeId) {
-    nextNode = story.deathBySanityNodeId;
-    forcedDeath = true;
+  let forcedFloor = false;
+  if (nextMeter <= story.meter.floor && nextNode !== story.meter.floorNodeId) {
+    nextNode = story.meter.floorNodeId;
+    forcedFloor = true;
   }
-
-  return {
-    state: { currentNode: nextNode, flags: nextFlags, sanity: nextSanity },
-    forcedDeath,
-  };
+  return { state: { currentNode: nextNode, flags: nextFlags, meter: nextMeter }, forcedFloor };
 }
 
 export function isEndingNode(node: StoryNode): boolean {
