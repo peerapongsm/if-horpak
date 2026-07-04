@@ -39,7 +39,7 @@ export default function StorySelectScreen() {
 
   return (
     <main className="screen">
-      <div className="topbar">
+      <div className="brand">
         <p className="game-title">if — ถ้า</p>
         <p className="game-subtitle">นิยายเลือกทางเดิน</p>
       </div>

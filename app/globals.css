@@ -123,7 +123,18 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
   margin-bottom: 20px;
+}
+
+/* Collection landing brand block — title stacked over subtitle, centered. */
+.brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.brand .game-subtitle {
+  margin-top: 2px;
 }
 
 .game-title {
@@ -633,7 +644,9 @@ body::before {
     justify-content: flex-start;
   }
 
-  .sanity-candles {
+  .sanity-candles,
+  .meter-hearts,
+  .meter-battery {
     position: fixed;
     top: 50%;
     right: clamp(24px, 4vw, 64px);
