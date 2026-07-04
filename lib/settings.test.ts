@@ -31,7 +31,7 @@ describe("text speed preference", () => {
 
   it("falls back to normal for a garbage stored value", () => {
     const storage = fakeStorage();
-    storage.setItem("if-horpak:text-speed:v1", "warp10");
+    storage.setItem("if:text-speed:v1", "warp10");
     expect(getTextSpeed(storage)).toBe("normal");
   });
 });

@@ -54,7 +54,7 @@ function findUnknownGotoTargets(story: StoryData): ValidationIssue[] {
 /**
  * Graph reachability from start, following choice.goto edges only (ignores requires —
  * requires-feasibility is a separate concern from "requires reference real flags").
- * The death-by-sanity node is always reachable in principle via the sanity mechanic,
+ * The meter floor node is always reachable in principle via the meter mechanic,
  * so it's seeded into the reachable set directly.
  */
 function reachableNodeIds(story: StoryData): Set<string> {
