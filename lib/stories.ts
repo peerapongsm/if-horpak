@@ -3,6 +3,7 @@
 
 import horpakJson from "../data/stories/horpak.json";
 import busJson from "../data/stories/bus.json";
+import faenPlomJson from "../data/stories/faen-plom.json";
 import type { StoryData } from "./engine";
 import type { EndingMeta } from "./endingsMeta";
 import type { AmbientMood } from "./ambient";
@@ -43,6 +44,19 @@ export const STORIES: StoryEntry[] = [
       { id: "ride_out", title: "หลับตาจนถึงเช้า" },
       { id: "true_ending", title: "ส่งทุกคนกลับบ้าน" },
       { id: "conductor", title: "กระเป๋าคนใหม่", secret: true },
+    ],
+  },
+  {
+    slug: "faen-plom", title: "แฟนปลอม 7 วัน",
+    tagline: "ดีลเป็นแฟนปลอมไปงานแต่งพี่สาวเขา แลกกับโหวตผ่านโปรเจกต์ — เจ็ดวันในบ้านเขา",
+    genre: "โรแมนซ์", ambientMood: "romance",
+    data: faenPlomJson as unknown as StoryData,
+    endings: [
+      { id: "real", title: "ของปลอมกลายเป็นจริง" },
+      { id: "deal", title: "จบดีลแบบมืออาชีพ" },
+      { id: "grandma", title: "ยายเก็บความลับให้" },
+      { id: "setup", title: "เขาวางแผนไว้แต่แรก", secret: true },
+      { id: "broke", title: "แผนแตกกลางงาน" },
     ],
   },
 ];
