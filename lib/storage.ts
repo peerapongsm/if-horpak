@@ -8,10 +8,12 @@ export function loadSave(slug: string): GameState | null {
     const raw = localStorage.getItem(saveKey(slug));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
+    const hasSingle = typeof parsed.meter === "number";
+    const hasMulti = typeof parsed.meters === "object" && parsed.meters !== null;
     if (
       typeof parsed !== "object" || parsed === null ||
       typeof parsed.currentNode !== "string" ||
-      typeof parsed.meter !== "number" ||
+      (!hasSingle && !hasMulti) ||
       typeof parsed.flags !== "object" || parsed.flags === null
     ) return null;
     return parsed as GameState;

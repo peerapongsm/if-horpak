@@ -21,6 +21,15 @@ describe("save / load", () => {
     localStorage.setItem("if:horpak:save", JSON.stringify({ currentNode: "x", flags: {} }));
     expect(loadSave("horpak")).toBeNull();
   });
+  it("round-trips a multi-meter save", () => {
+    const state: GameState = { currentNode: "b", flags: { used_recipe: true }, meters: { glomkleun: 4, huajai: 2 } };
+    saveGame("tamrap-rak", state);
+    expect(loadSave("tamrap-rak")).toEqual(state);
+  });
+  it("rejects a save missing both meter and meters", () => {
+    localStorage.setItem("if:x:save", JSON.stringify({ currentNode: "a", flags: {} }));
+    expect(loadSave("x")).toBeNull();
+  });
   it("clearSave removes the save", () => {
     saveGame("horpak", { currentNode: "start", flags: {}, meter: 3 });
     clearSave("horpak");
