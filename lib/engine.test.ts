@@ -30,7 +30,7 @@ describe("initState", () => {
     expect(s.flags).toEqual({});
   });
   it("honors meter.start when set below max", () => {
-    const romance: StoryData = { ...story, meter: { ...story.meter, max: 5, start: 2 } };
+    const romance: StoryData = { ...story, meter: { ...story.meter!, max: 5, start: 2 } };
     expect(initState(romance).meter).toBe(2);
   });
 });
