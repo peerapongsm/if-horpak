@@ -26,6 +26,7 @@ export default function StorySelect({ stories, statuses, onPick }: StorySelectPr
             className="story-card"
             onClick={() => onPick(story.slug)}
           >
+            <span className="story-card-genre">{story.genre}</span>
             <span className="story-card-title">{story.title}</span>
             <span className="story-card-tagline">{story.tagline}</span>
             <span className="story-card-meta">

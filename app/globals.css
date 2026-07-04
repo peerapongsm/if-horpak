@@ -136,6 +136,16 @@ body::before {
   text-wrap: balance;
 }
 
+.game-subtitle {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--color-text-dim);
+  opacity: 0.75;
+  margin: 0;
+  text-wrap: pretty;
+}
+
 .sanity-candles {
   display: flex;
   gap: 10px;
@@ -564,6 +574,20 @@ body::before {
   transform: translateY(-2px);
 }
 
+.story-card-genre {
+  align-self: flex-start;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--color-accent);
+  background: rgba(232, 163, 61, 0.14);
+  border: 1px solid rgba(232, 163, 61, 0.3);
+  border-radius: 999px;
+  padding: 3px 12px;
+  text-wrap: pretty;
+}
+
 .story-card-title {
   font-family: var(--font-title);
   font-size: 1.35rem;
@@ -647,5 +671,20 @@ body::before {
     stroke-dashoffset: 0;
     opacity: 0.5;
     transform: none;
+  }
+}
+
+/* Collection landing: single column on mobile, 2-up flat grid on desktop
+   once there's room for two cards side by side. */
+@media (min-width: 720px) {
+  .story-select {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .select-label {
+    grid-column: 1 / -1;
   }
 }
