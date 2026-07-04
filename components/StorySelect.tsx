@@ -24,6 +24,7 @@ export default function StorySelect({ stories, statuses, onPick }: StorySelectPr
             key={story.slug}
             type="button"
             className="story-card"
+            data-genre={story.ambientMood}
             onClick={() => onPick(story.slug)}
           >
             <span className="story-card-genre">{story.genre}</span>

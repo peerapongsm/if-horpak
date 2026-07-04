@@ -15,6 +15,10 @@ export default function StorySelectScreen() {
   const ambient = () => (ambientRef.current ??= new AmbientEngine("horror"));
 
   useEffect(() => {
+    document.documentElement.dataset.theme = "neutral";
+  }, []);
+
+  useEffect(() => {
     setHydrated(true);
     if (getAmbientPref(window.localStorage)) {
       setAmbientOn(true);

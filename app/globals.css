@@ -16,7 +16,126 @@
   --font-body: var(--font-sarabun), "Noto Sans Thai", system-ui, sans-serif;
   --font-accent: var(--font-trirong), "Noto Serif Thai", serif;
   --font-title: var(--font-charmonman), var(--font-trirong), serif;
+  /* Themeable surfaces (horror defaults; overridden per [data-theme]). */
+  --panel-bg: linear-gradient(180deg, rgba(16, 11, 6, 0.58), rgba(6, 4, 2, 0.42));
+  --card-bg: linear-gradient(180deg, rgba(16, 11, 6, 0.72), rgba(6, 4, 2, 0.55));
+  --nested-bg: linear-gradient(180deg, rgba(26, 19, 11, 0.7), rgba(5, 3, 1, 0.55));
+  --chip-bg: rgba(58, 41, 22, 0.35);
+  --chip-bg-strong: rgba(58, 41, 22, 0.55);
+  --btn-primary: linear-gradient(178deg, #f0d9a0, #d9b667);
+  --btn-primary-hover: linear-gradient(178deg, #f5e2b0, #e2c47e);
+  --card-shadow: none;
+  --panel-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.03),
+    inset 0 0 46px rgba(0, 0, 0, 0.3),
+    0 24px 48px rgba(0, 0, 0, 0.35);
+  --bg-glow: radial-gradient(
+    ellipse 620px 560px at 50% 44%,
+    rgba(255, 179, 92, 0.16) 0%,
+    rgba(255, 150, 63, 0.06) 45%,
+    transparent 72%
+  );
+  --veil-bg: #000;
 }
+
+/* ---- Per-route themes (set on <html data-theme>) ---- */
+
+/* Neutral — clean light gallery for the collection landing. */
+html[data-theme="neutral"] {
+  --color-bg: #faf9f7;
+  --color-bg-soft: #f1efec;
+  --color-panel: #ffffff;
+  --color-border: #e5e2dc;
+  --color-text: #23201c;
+  --color-text-dim: #726d64;
+  --color-accent: #7b6bc4;
+  --color-accent-dim: #b4abe0;
+  --color-danger: #c1613f;
+  --color-paper: #efeafa;
+  --color-paper-dark: #e3daf3;
+  --color-ink: #2c2743;
+  --color-surface: rgba(255, 255, 255, 0.7);
+  --color-surface-edge: rgba(34, 32, 28, 0.1);
+  --font-title: var(--font-accent);
+  --panel-bg: #ffffff;
+  --card-bg: #ffffff;
+  --nested-bg: #f6f4f1;
+  --chip-bg: rgba(34, 32, 28, 0.05);
+  --chip-bg-strong: rgba(34, 32, 28, 0.09);
+  --btn-primary: linear-gradient(178deg, #8574d0, #6d5cbf);
+  --btn-primary-hover: linear-gradient(178deg, #9686db, #7d6cd0);
+  --card-shadow: 0 2px 14px rgba(40, 34, 60, 0.08);
+  --panel-shadow: 0 6px 26px rgba(40, 34, 60, 0.08);
+  --bg-glow: none;
+  --veil-bg: #faf9f7;
+}
+html[data-theme="neutral"] .primary-btn { color: #fff; }
+
+/* Romance — warm dusk, rose accents. */
+html[data-theme="romance"] {
+  --color-bg: #241519;
+  --color-bg-soft: #2e1b20;
+  --color-panel: #3a2027;
+  --color-border: #5c3b44;
+  --color-text: #f6e7df;
+  --color-text-dim: #cfa9a4;
+  --color-accent: #e88aa0;
+  --color-accent-dim: #a35c68;
+  --color-danger: #e0607a;
+  --color-paper: #f2dccf;
+  --color-ink: #3a1f24;
+  --color-paper-dark: #e7c8bc;
+  --color-surface: rgba(58, 32, 39, 0.55);
+  --color-surface-edge: rgba(231, 138, 160, 0.18);
+  --font-title: var(--font-accent);
+  --panel-bg: linear-gradient(180deg, rgba(58, 32, 39, 0.55), rgba(36, 21, 25, 0.5));
+  --card-bg: linear-gradient(180deg, rgba(58, 32, 39, 0.62), rgba(36, 21, 25, 0.5));
+  --nested-bg: linear-gradient(180deg, rgba(70, 38, 46, 0.6), rgba(36, 21, 25, 0.55));
+  --chip-bg: rgba(231, 138, 160, 0.12);
+  --chip-bg-strong: rgba(231, 138, 160, 0.22);
+  --btn-primary: linear-gradient(178deg, #f2dccf, #e7c0b3);
+  --btn-primary-hover: linear-gradient(178deg, #f8e6db, #eecabd);
+  --card-shadow: none;
+  --bg-glow: radial-gradient(
+    ellipse 620px 560px at 50% 44%,
+    rgba(255, 170, 140, 0.14) 0%,
+    rgba(230, 120, 140, 0.06) 45%,
+    transparent 72%
+  );
+  --veil-bg: #241519;
+}
+
+/* Office — corporate daylight, synergy-green accent, flat. */
+html[data-theme="office"] {
+  --color-bg: #eef1f4;
+  --color-bg-soft: #e4e8ed;
+  --color-panel: #ffffff;
+  --color-border: #d3d8df;
+  --color-text: #1b2530;
+  --color-text-dim: #5c6773;
+  --color-accent: #12a878;
+  --color-accent-dim: #8fd6bf;
+  --color-danger: #e0603f;
+  --color-paper: #dcf2e9;
+  --color-paper-dark: #c8e8d8;
+  --color-ink: #123a2c;
+  --color-surface: rgba(255, 255, 255, 0.75);
+  --color-surface-edge: rgba(27, 37, 48, 0.1);
+  --font-title: var(--font-body);
+  --panel-bg: #ffffff;
+  --card-bg: #ffffff;
+  --nested-bg: #f0f3f6;
+  --chip-bg: rgba(27, 37, 48, 0.05);
+  --chip-bg-strong: rgba(18, 168, 120, 0.14);
+  --btn-primary: linear-gradient(178deg, #17c08a, #12a878);
+  --btn-primary-hover: linear-gradient(178deg, #24cf98, #17b482);
+  --card-shadow: 0 1px 3px rgba(27, 37, 48, 0.1);
+  --panel-shadow: 0 3px 18px rgba(27, 37, 48, 0.09);
+  --bg-glow: none;
+  --veil-bg: #eef1f4;
+}
+html[data-theme="office"] .primary-btn { color: #fff; }
+html[data-theme="office"] .game-title { letter-spacing: 0.02em; }
 
 * {
   box-sizing: border-box;
@@ -46,12 +165,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: radial-gradient(
-    ellipse 620px 560px at 50% 44%,
-    rgba(255, 179, 92, 0.16) 0%,
-    rgba(255, 150, 63, 0.06) 45%,
-    transparent 72%
-  );
+  background: var(--bg-glow);
   pointer-events: none;
   z-index: 0;
   animation: candle-breathe 9s ease-in-out infinite;
@@ -104,7 +218,7 @@ body::before {
 .scene-veil {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: var(--veil-bg);
   pointer-events: none;
   z-index: 50;
   animation: veil-fade 200ms ease-out forwards;
@@ -314,14 +428,11 @@ body::before {
   justify-content: center;
   gap: 24px;
   padding: 30px 22px;
+  background: var(--panel-bg);
   min-height: 40vh;
-  background: linear-gradient(180deg, rgba(16, 11, 6, 0.58), rgba(6, 4, 2, 0.42));
   border: 1px solid var(--color-surface-edge);
   border-radius: 18px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 220, 170, 0.03),
-    inset 0 0 46px rgba(0, 0, 0, 0.3),
-    0 24px 48px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--panel-shadow);
 }
 
 .story-text {
@@ -397,7 +508,7 @@ body::before {
 }
 
 .primary-btn {
-  background: linear-gradient(178deg, #f0d9a0, #d9b667);
+  background: var(--btn-primary);
   text-align: center;
   font-weight: 600;
   --tilt: 0deg;
@@ -405,12 +516,12 @@ body::before {
 
 .primary-btn:hover,
 .primary-btn:focus-visible {
-  background: linear-gradient(178deg, #f5e2b0, #e2c47e);
+  background: var(--btn-primary-hover);
 }
 
 .text-btn {
   appearance: none;
-  background: rgba(58, 41, 22, 0.35);
+  background: var(--chip-bg);
   border: 1px solid var(--color-border);
   border-radius: 999px;
   color: var(--color-text-dim);
@@ -425,7 +536,7 @@ body::before {
 .text-btn:hover {
   color: var(--color-danger);
   border-color: var(--color-danger);
-  background: rgba(58, 41, 22, 0.55);
+  background: var(--chip-bg-strong);
 }
 
 .text-btn:focus-visible {
@@ -441,13 +552,10 @@ body::before {
   flex-direction: column;
   gap: 18px;
   padding: 32px 22px;
-  background: linear-gradient(180deg, rgba(16, 11, 6, 0.58), rgba(6, 4, 2, 0.42));
+  background: var(--panel-bg);
   border: 1px solid var(--color-surface-edge);
   border-radius: 18px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 220, 170, 0.03),
-    inset 0 0 46px rgba(0, 0, 0, 0.3),
-    0 24px 48px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--panel-shadow);
 }
 
 .incense-wisp {
@@ -507,7 +615,7 @@ body::before {
   padding: 16px;
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(26, 19, 11, 0.7), rgba(5, 3, 1, 0.55));
+  background: var(--nested-bg);
 }
 
 .ending-collection-label {
@@ -567,7 +675,8 @@ body::before {
   appearance: none;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(16, 11, 6, 0.72), rgba(6, 4, 2, 0.55));
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
   color: var(--color-text);
   font-family: var(--font-body);
   text-align: left;
@@ -597,6 +706,35 @@ body::before {
   border-radius: 999px;
   padding: 3px 12px;
   text-wrap: pretty;
+}
+
+/* Per-genre card tint on the (neutral) landing: colored left stripe + pill. */
+.story-card[data-genre] {
+  border-left-width: 3px;
+}
+.story-card[data-genre="horror"] {
+  border-left-color: #9a6a2a;
+}
+.story-card[data-genre="horror"] .story-card-genre {
+  color: #a8702a;
+  background: rgba(168, 112, 42, 0.12);
+  border-color: rgba(168, 112, 42, 0.3);
+}
+.story-card[data-genre="romance"] {
+  border-left-color: #e0708a;
+}
+.story-card[data-genre="romance"] .story-card-genre {
+  color: #c65b74;
+  background: rgba(224, 112, 138, 0.13);
+  border-color: rgba(224, 112, 138, 0.32);
+}
+.story-card[data-genre="office"] {
+  border-left-color: #12a878;
+}
+.story-card[data-genre="office"] .story-card-genre {
+  color: #0e9066;
+  background: rgba(18, 168, 120, 0.13);
+  border-color: rgba(18, 168, 120, 0.32);
 }
 
 .story-card-title {

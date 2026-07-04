@@ -51,6 +51,11 @@ export default function StoryPlayer({ slug }: { slug: string }) {
     return ambientRef.current;
   };
 
+  // Match the page theme to this story's genre.
+  useEffect(() => {
+    if (entry) document.documentElement.dataset.theme = entry.ambientMood;
+  }, [entry]);
+
   // Hydrate save + settings after mount (client-only).
   useEffect(() => {
     if (!entry) return;

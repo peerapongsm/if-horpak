@@ -36,6 +36,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="th" className={`${sarabun.variable} ${trirong.variable} ${charmonman.variable}`}>
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var p=location.pathname.replace(/\\/+$/,'');var m={'/faen-plom':'romance','/borisat':'office','/horpak':'horror','/bus':'horror'};document.documentElement.dataset.theme=m[p]||'neutral';})();",
+          }}
+        />
+        <script
           defer
           src="https://umami-host-peerapongsms-projects.vercel.app/script.js"
           data-website-id="3f09453d-0b39-443e-8845-5e65611cc58a"
