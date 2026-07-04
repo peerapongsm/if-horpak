@@ -5,6 +5,7 @@ import horpakJson from "../data/stories/horpak.json";
 import busJson from "../data/stories/bus.json";
 import faenPlomJson from "../data/stories/faen-plom.json";
 import borisatJson from "../data/stories/borisat.json";
+import tamrapRakJson from "../data/stories/tamrap-rak.json";
 import type { StoryData } from "./engine";
 import type { EndingMeta } from "./endingsMeta";
 import type { AmbientMood } from "./ambient";
@@ -72,6 +73,20 @@ export const STORIES: StoryEntry[] = [
       { id: "survive", title: "เอาตัวรอดเงียบๆ" },
       { id: "scheme", title: "บริษัทคือพีระมิด", secret: true },
       { id: "burnout", title: "หมดไฟกลางวัน" },
+    ],
+  },
+  {
+    slug: "tamrap-rak", title: "ตำรับรักกรุงเก่า",
+    tagline: "เชฟยุคใหม่ตื่นมาในร่างแม่หญิงกรุงเก่า ก่อนวันคลุมถุงชน — มีแค่ฝีมือครัวแห่งอนาคตเป็นอาวุธ",
+    genre: "ย้อนเวลา", ambientMood: "period",
+    data: tamrapRakJson as unknown as StoryData,
+    endings: [
+      { id: "stay", title: "เลือกอยู่กรุงเก่า" },
+      { id: "return", title: "กลับสู่ปัจจุบัน" },
+      { id: "reincarnation", title: "เกิดใหม่เจอกันอีก" },
+      { id: "exposed", title: "โดนจับว่าผีเข้า" },
+      { id: "heartbreak", title: "ใจที่ไปไม่ถึง" },
+      { id: "trapped", title: "ตำรับใหม่ในกรุงเก่า", secret: true },
     ],
   },
 ];
