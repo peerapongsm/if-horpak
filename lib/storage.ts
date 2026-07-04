@@ -1,49 +1,36 @@
-// localStorage persistence: autosave of the current run + the set of endings
-// ever found, kept per story. The original single-story keys are preserved as
-// the "horpak" story's keys so pre-multi-story players lose nothing.
-
 import type { GameState } from "./engine";
 
-function saveKey(storySlug: string): string {
-  return storySlug === "horpak" ? "if-horpak:save" : `if-horpak:${storySlug}:save`;
-}
+const saveKey = (slug: string) => `if:${slug}:save`;
+const endingsKey = (slug: string) => `if:${slug}:endings-found`;
 
-function endingsKey(storySlug: string): string {
-  return storySlug === "horpak" ? "if-horpak:endings-found" : `if-horpak:${storySlug}:endings-found`;
-}
-
-export function loadSave(storySlug: string): GameState | null {
+export function loadSave(slug: string): GameState | null {
   try {
-    const raw = localStorage.getItem(saveKey(storySlug));
+    const raw = localStorage.getItem(saveKey(slug));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (
-      typeof parsed !== "object" ||
-      parsed === null ||
+      typeof parsed !== "object" || parsed === null ||
       typeof parsed.currentNode !== "string" ||
-      typeof parsed.sanity !== "number" ||
-      typeof parsed.flags !== "object" ||
-      parsed.flags === null
-    ) {
-      return null;
-    }
+      typeof parsed.meter !== "number" ||
+      typeof parsed.flags !== "object" || parsed.flags === null
+    ) return null;
     return parsed as GameState;
   } catch {
     return null;
   }
 }
 
-export function saveGame(storySlug: string, state: GameState): void {
-  localStorage.setItem(saveKey(storySlug), JSON.stringify(state));
+export function saveGame(slug: string, state: GameState): void {
+  localStorage.setItem(saveKey(slug), JSON.stringify(state));
 }
 
-export function clearSave(storySlug: string): void {
-  localStorage.removeItem(saveKey(storySlug));
+export function clearSave(slug: string): void {
+  localStorage.removeItem(saveKey(slug));
 }
 
-export function loadFoundEndings(storySlug: string): string[] {
+export function loadFoundEndings(slug: string): string[] {
   try {
-    const raw = localStorage.getItem(endingsKey(storySlug));
+    const raw = localStorage.getItem(endingsKey(slug));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -53,10 +40,10 @@ export function loadFoundEndings(storySlug: string): string[] {
   }
 }
 
-export function addFoundEnding(storySlug: string, endingId: string): string[] {
-  const existing = loadFoundEndings(storySlug);
+export function addFoundEnding(slug: string, endingId: string): string[] {
+  const existing = loadFoundEndings(slug);
   if (existing.includes(endingId)) return existing;
   const next = [...existing, endingId];
-  localStorage.setItem(endingsKey(storySlug), JSON.stringify(next));
+  localStorage.setItem(endingsKey(slug), JSON.stringify(next));
   return next;
 }
