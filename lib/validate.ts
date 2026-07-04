@@ -17,6 +17,11 @@ export interface ValidationIssue {
   message: string;
 }
 
+function storyFloorNodeIds(story: StoryData): string[] {
+  if (story.meters) return Object.values(story.meters).map((m) => m.floorNodeId);
+  return story.meter ? [story.meter.floorNodeId] : [];
+}
+
 function findDuplicateIds(story: StoryData): ValidationIssue[] {
   const seen = new Set<string>();
   const issues: ValidationIssue[] = [];
@@ -42,11 +47,10 @@ function findUnknownGotoTargets(story: StoryData): ValidationIssue[] {
       }
     }
   }
-  if (!ids.has(story.meter.floorNodeId)) {
-    issues.push({
-      rule: "unknown-goto-target",
-      message: `meter.floorNodeId "${story.meter.floorNodeId}" is not a known node`,
-    });
+  for (const floorId of storyFloorNodeIds(story)) {
+    if (!ids.has(floorId)) {
+      issues.push({ rule: "unknown-goto-target", message: `meter floorNodeId "${floorId}" is not a known node` });
+    }
   }
   return issues;
 }
@@ -64,9 +68,11 @@ function reachableNodeIds(story: StoryData): Set<string> {
 
   const queue = [story.start];
   reachable.add(story.start);
-  if (ids.has(story.meter.floorNodeId) && !reachable.has(story.meter.floorNodeId)) {
-    reachable.add(story.meter.floorNodeId);
-    queue.push(story.meter.floorNodeId);
+  for (const floorId of storyFloorNodeIds(story)) {
+    if (ids.has(floorId) && !reachable.has(floorId)) {
+      reachable.add(floorId);
+      queue.push(floorId);
+    }
   }
 
   while (queue.length > 0) {
@@ -152,12 +158,14 @@ function findUnsettableRequiredFlags(story: StoryData): ValidationIssue[] {
 }
 
 function findFloorNotEnding(story: StoryData): ValidationIssue[] {
-  const node = story.nodes.find((n) => n.id === story.meter.floorNodeId);
-  if (node && !node.isEnding) {
-    return [{ rule: "floor-not-ending",
-      message: `meter.floorNodeId "${story.meter.floorNodeId}" is not an ending node` }];
+  const issues: ValidationIssue[] = [];
+  for (const floorId of storyFloorNodeIds(story)) {
+    const node = story.nodes.find((n) => n.id === floorId);
+    if (node && !node.isEnding) {
+      issues.push({ rule: "floor-not-ending", message: `meter floorNodeId "${floorId}" is not an ending node` });
+    }
   }
-  return [];
+  return issues;
 }
 
 function findChapterOutOfRange(story: StoryData): ValidationIssue[] {

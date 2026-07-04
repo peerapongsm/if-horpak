@@ -121,6 +121,36 @@ describe("validateStory: floor-not-ending", () => {
   });
 });
 
+function baseMultiStory(): StoryData {
+  return {
+    schemaVersion: 1,
+    start: "a",
+    meters: {
+      glomkleun: { label: "การกลมกลืน", max: 5, start: 3, floor: 0, floorNodeId: "end_exposed", viz: "lotus" },
+      huajai: { label: "ใจคุณหลวง", max: 5, start: 1, floor: 0, floorNodeId: "end_heartbreak", viz: "hearts" },
+    },
+    nodes: [
+      { id: "a", text: "a", choices: [{ label: "go", goto: "end_stay", sets: { vow: true } }] },
+      { id: "end_stay", text: "stay", isEnding: true, endingId: "stay" },
+      { id: "end_exposed", text: "exposed", isEnding: true, endingId: "exposed" },
+      { id: "end_heartbreak", text: "heartbreak", isEnding: true, endingId: "heartbreak" },
+    ],
+  };
+}
+
+describe("validateStory: multi-meter", () => {
+  it("passes a well-formed multi-meter story (both floor endings reachable+ending)", () => {
+    const story = baseMultiStory();
+    expect(validateStory(story, ["stay", "exposed", "heartbreak"])).toEqual([]);
+  });
+  it("flags a multi-meter floorNodeId that is not an ending", () => {
+    const story = baseMultiStory();
+    story.meters!.glomkleun.floorNodeId = "a";
+    const issues = validateStory(story, ["stay", "exposed", "heartbreak"]);
+    expect(issues.some((i) => i.rule === "floor-not-ending")).toBe(true);
+  });
+});
+
 describe("validateStory: chapter-out-of-range", () => {
   it("flags a chapter index greater than total", () => {
     const story = baseValidStory();
