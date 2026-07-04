@@ -388,6 +388,29 @@ body::before {
   background: rgba(169, 154, 130, 0.25);
 }
 
+.meter-lotus {
+  display: flex;
+  gap: 8px;
+}
+.meter-lotus .lotus path {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.2;
+}
+.meter-lotus .lotus-open path {
+  fill: var(--color-accent);
+  fill-opacity: 0.22;
+}
+.meter-lotus .lotus-closed {
+  opacity: 0.4;
+}
+/* Two meters stacked, spaced apart so they read as separate gauges. */
+.meter-stack {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .chapter-bar {
   display: flex;
   flex-direction: column;
@@ -879,6 +902,15 @@ body::before {
     transform: translateY(-50%);
     flex-direction: column;
     gap: 18px;
+  }
+
+  .meter-stack {
+    position: fixed;
+    top: 50%;
+    right: clamp(24px, 4vw, 64px);
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: 22px;
   }
 
   .choice-list-grid {

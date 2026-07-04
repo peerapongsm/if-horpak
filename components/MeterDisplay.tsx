@@ -43,6 +43,16 @@ function Bar({ charged, index }: { charged: boolean; index: number }) {
     style={{ animationDelay: `${index * 0.1}s` }} aria-hidden="true" />;
 }
 
+function Lotus({ open, index }: { open: boolean; index: number }) {
+  return (
+    <svg className={open ? "lotus lotus-open" : "lotus lotus-closed"} width="20" height="20"
+      viewBox="0 0 20 20" aria-hidden="true" style={{ animationDelay: `${index * 0.12}s` }}>
+      <path d="M10 17c-3-1-5-3.5-5-6 0 0 2 1 5 5 3-4 5-5 5-5 0 2.5-2 5-5 6Z" />
+      <path d="M10 16c-1.6-1.4-2.4-3-2.4-4.8 0-1.8 1-3.4 2.4-4.6 1.4 1.2 2.4 2.8 2.4 4.6 0 1.8-.8 3.4-2.4 4.8Z" />
+    </svg>
+  );
+}
+
 export default function MeterDisplay({ meter, value }: { meter: Meter; value: number }) {
   if (meter.hideBar) return null;
   const slots = Array.from({ length: meter.max }, (_, i) => i < value);
@@ -54,6 +64,10 @@ export default function MeterDisplay({ meter, value }: { meter: Meter; value: nu
   if (meter.viz === "battery") {
     return <div className="meter meter-battery" aria-label={label}>
       {slots.map((c, i) => <Bar key={i} charged={c} index={i} />)}</div>;
+  }
+  if (meter.viz === "lotus") {
+    return <div className="meter meter-lotus" aria-label={label}>
+      {slots.map((o, i) => <Lotus key={i} open={o} index={i} />)}</div>;
   }
   return <div className="sanity-candles" aria-label={label}>
     {slots.map((lit, i) => <Candle key={i} lit={lit} index={i} />)}</div>;

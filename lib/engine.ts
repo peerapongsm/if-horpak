@@ -31,7 +31,7 @@ export interface StoryNode {
   choices?: Choice[];
 }
 
-export type MeterViz = "candles" | "hearts" | "battery";
+export type MeterViz = "candles" | "hearts" | "battery" | "lotus";
 
 export interface Meter {
   label: string;

@@ -159,7 +159,17 @@ export default function StoryPlayer({ slug }: { slug: string }) {
       </nav>
       <div className="topbar">
         <p className="game-title">{entry.title}</p>
-        {!ending && <MeterDisplay meter={entry.data.meter} value={gameState.meter} />}
+        {!ending && (
+          entry.data.meters ? (
+            <div className="meter-stack">
+              {Object.entries(entry.data.meters).map(([k, m]) => (
+                <MeterDisplay key={k} meter={m} value={gameState.meters?.[k] ?? m.start ?? m.max} />
+              ))}
+            </div>
+          ) : entry.data.meter ? (
+            <MeterDisplay meter={entry.data.meter} value={gameState.meter ?? 0} />
+          ) : null
+        )}
       </div>
 
       {ending ? (

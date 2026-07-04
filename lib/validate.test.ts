@@ -115,7 +115,7 @@ describe("validateStory: missing-start-node", () => {
 describe("validateStory: floor-not-ending", () => {
   it("flags a floorNodeId pointing at a non-ending node", () => {
     const story = baseValidStory();
-    story.meter.floorNodeId = "a"; // "a" is not an ending
+    story.meter!.floorNodeId = "a"; // "a" is not an ending
     const issues = validateStory(story, FIXTURE_ENDING_IDS);
     expect(issues.some((i) => i.rule === "floor-not-ending")).toBe(true);
   });
