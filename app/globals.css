@@ -137,6 +137,37 @@ html[data-theme="office"] {
 html[data-theme="office"] .primary-btn { color: #fff; }
 html[data-theme="office"] .game-title { letter-spacing: 0.02em; }
 
+/* Period — ทองชาดสีคราม, gold/vermilion/indigo court palette. */
+html[data-theme="period"] {
+  --color-bg: #f3ead6;
+  --color-bg-soft: #e9dcc0;
+  --color-panel: #fbf5e6;
+  --color-border: #d8c49a;
+  --color-text: #3a2a16;
+  --color-text-dim: #7a6544;
+  --color-accent: #b23a2e;        /* ชาด */
+  --color-accent-dim: #d8a24b;    /* ทอง */
+  --color-danger: #a3302a;
+  --color-paper: #efe0bf;
+  --color-paper-dark: #e2cf9f;
+  --color-ink: #3a2a16;
+  --color-surface: rgba(251, 245, 230, 0.72);
+  --color-surface-edge: rgba(58, 42, 22, 0.12);
+  --font-title: var(--font-accent);
+  --panel-bg: #fbf5e6;
+  --card-bg: #fbf5e6;
+  --nested-bg: #f1e6cf;
+  --chip-bg: rgba(58, 42, 22, 0.06);
+  --chip-bg-strong: rgba(178, 58, 46, 0.12);
+  --btn-primary: linear-gradient(178deg, #c9a24b, #b8912f);
+  --btn-primary-hover: linear-gradient(178deg, #d6b25e, #c49d3c);
+  --card-shadow: 0 2px 14px rgba(58, 42, 22, 0.1);
+  --panel-shadow: 0 6px 26px rgba(58, 42, 22, 0.1);
+  --bg-glow: radial-gradient(ellipse 620px 560px at 50% 44%, rgba(201, 162, 75, 0.16) 0%, rgba(178, 58, 46, 0.05) 45%, transparent 72%);
+  --veil-bg: #f3ead6;
+}
+html[data-theme="period"] .primary-btn { color: #3a2a16; }
+
 * {
   box-sizing: border-box;
 }

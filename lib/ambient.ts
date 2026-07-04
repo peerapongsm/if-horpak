@@ -21,7 +21,7 @@ export function setAmbientPref(storage: StorageLike, on: boolean): void {
   storage.setItem(SOUND_PREF_KEY, on ? "on" : "off");
 }
 
-export type AmbientMood = "horror" | "romance" | "office";
+export type AmbientMood = "horror" | "romance" | "office" | "period";
 
 interface MoodConfig {
   droneFreqs: number[]; // detuned low pair/triad
@@ -35,6 +35,7 @@ const MOODS: Record<AmbientMood, MoodConfig> = {
   horror: { droneFreqs: [55, 55.6, 110.3], droneFilterHz: 220, masterGain: 0.07, shimmerHz: 2400, eventKind: "knock" },
   romance: { droneFreqs: [98, 98.4, 147], droneFilterHz: 320, masterGain: 0.06, shimmerHz: 1800, eventKind: "chime" },
   office: { droneFreqs: [120, 120.5, 60], droneFilterHz: 500, masterGain: 0.05, shimmerHz: 3200, eventKind: "keyboard" },
+  period: { droneFreqs: [110, 110.4, 165], droneFilterHz: 400, masterGain: 0.055, shimmerHz: 1400, eventKind: "chime" },
 };
 
 export class AmbientEngine {

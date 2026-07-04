@@ -38,7 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var p=location.pathname.replace(/\\/+$/,'');var m={'/faen-plom':'romance','/borisat':'office','/horpak':'horror','/bus':'horror'};document.documentElement.dataset.theme=m[p]||'neutral';})();",
+              "(function(){var p=location.pathname.replace(/\\/+$/,'');var m={'/faen-plom':'romance','/borisat':'office','/horpak':'horror','/bus':'horror','/tamrap-rak':'period'};document.documentElement.dataset.theme=m[p]||'neutral';})();",
           }}
         />
         <script
