@@ -7,8 +7,9 @@ const FIXTURE_ENDING_IDS = ["death", "flee", "survive_unaware", "true_ending", "
 
 function baseValidStory(): StoryData {
   return {
+    schemaVersion: 1,
     start: "a",
-    deathBySanityNodeId: "end_death",
+    meter: { label: "สติ", max: 3, floor: 0, floorNodeId: "end_death", viz: "candles" },
     nodes: [
       { id: "a", text: "a", choices: [{ label: "go b", goto: "b", sets: { flag_x: true } }] },
       { id: "b", text: "b", choices: [{ label: "go end", goto: "end_flee", requires: { flag_x: true } }] },
@@ -108,6 +109,24 @@ describe("validateStory: missing-start-node", () => {
     story.start = "nowhere";
     const issues = validateStory(story, FIXTURE_ENDING_IDS);
     expect(issues.some((i) => i.rule === "missing-start-node")).toBe(true);
+  });
+});
+
+describe("validateStory: floor-not-ending", () => {
+  it("flags a floorNodeId pointing at a non-ending node", () => {
+    const story = baseValidStory();
+    story.meter.floorNodeId = "a"; // "a" is not an ending
+    const issues = validateStory(story, FIXTURE_ENDING_IDS);
+    expect(issues.some((i) => i.rule === "floor-not-ending")).toBe(true);
+  });
+});
+
+describe("validateStory: chapter-out-of-range", () => {
+  it("flags a chapter index greater than total", () => {
+    const story = baseValidStory();
+    story.nodes.find((n) => n.id === "a")!.chapter = { label: "วันที่ 9", index: 9, total: 7 };
+    const issues = validateStory(story, FIXTURE_ENDING_IDS);
+    expect(issues.some((i) => i.rule === "chapter-out-of-range")).toBe(true);
   });
 });
 

@@ -11,7 +11,9 @@ export interface ValidationIssue {
     | "unknown-goto-target"
     | "unsettable-required-flag"
     | "duplicate-node-id"
-    | "missing-start-node";
+    | "missing-start-node"
+    | "chapter-out-of-range"
+    | "floor-not-ending";
   message: string;
 }
 
@@ -40,10 +42,10 @@ function findUnknownGotoTargets(story: StoryData): ValidationIssue[] {
       }
     }
   }
-  if (!ids.has(story.deathBySanityNodeId)) {
+  if (!ids.has(story.meter.floorNodeId)) {
     issues.push({
       rule: "unknown-goto-target",
-      message: `deathBySanityNodeId "${story.deathBySanityNodeId}" is not a known node`,
+      message: `meter.floorNodeId "${story.meter.floorNodeId}" is not a known node`,
     });
   }
   return issues;
@@ -62,9 +64,9 @@ function reachableNodeIds(story: StoryData): Set<string> {
 
   const queue = [story.start];
   reachable.add(story.start);
-  if (ids.has(story.deathBySanityNodeId) && !reachable.has(story.deathBySanityNodeId)) {
-    reachable.add(story.deathBySanityNodeId);
-    queue.push(story.deathBySanityNodeId);
+  if (ids.has(story.meter.floorNodeId) && !reachable.has(story.meter.floorNodeId)) {
+    reachable.add(story.meter.floorNodeId);
+    queue.push(story.meter.floorNodeId);
   }
 
   while (queue.length > 0) {
@@ -149,6 +151,28 @@ function findUnsettableRequiredFlags(story: StoryData): ValidationIssue[] {
   return issues;
 }
 
+function findFloorNotEnding(story: StoryData): ValidationIssue[] {
+  const node = story.nodes.find((n) => n.id === story.meter.floorNodeId);
+  if (node && !node.isEnding) {
+    return [{ rule: "floor-not-ending",
+      message: `meter.floorNodeId "${story.meter.floorNodeId}" is not an ending node` }];
+  }
+  return [];
+}
+
+function findChapterOutOfRange(story: StoryData): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  for (const node of story.nodes) {
+    const c = node.chapter;
+    if (!c) continue;
+    if (c.index < 1 || c.index > c.total || c.total < 1) {
+      issues.push({ rule: "chapter-out-of-range",
+        message: `Node "${node.id}" chapter index ${c.index}/${c.total} is out of range` });
+    }
+  }
+  return issues;
+}
+
 export function validateStory(story: StoryData, expectedEndingIds: readonly string[]): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -165,6 +189,8 @@ export function validateStory(story: StoryData, expectedEndingIds: readonly stri
   issues.push(...findNonEndingDeadEnds(story));
   issues.push(...findUnreachableEndings(story, reachable, expectedEndingIds));
   issues.push(...findUnsettableRequiredFlags(story));
+  issues.push(...findFloorNotEnding(story));
+  issues.push(...findChapterOutOfRange(story));
 
   return issues;
 }
