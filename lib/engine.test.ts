@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   initState, applyChoice, isChoiceAvailable, availableChoices,
-  getNode, isEndingNode, type StoryData,
+  getNode, isEndingNode, isMultiMeter, type StoryData,
 } from "./engine";
 
 const story: StoryData = {
@@ -86,5 +86,65 @@ describe("isEndingNode", () => {
   it("identifies ending nodes", () => {
     expect(isEndingNode(getNode(story, "d"))).toBe(true);
     expect(isEndingNode(getNode(story, "a"))).toBe(false);
+  });
+});
+
+const multiStory: StoryData = {
+  schemaVersion: 1,
+  start: "a",
+  meters: {
+    glomkleun: { label: "การกลมกลืน", max: 5, start: 3, floor: 0, floorNodeId: "end_exposed", viz: "lotus" },
+    huajai: { label: "ใจคุณหลวง", max: 5, start: 1, floor: 0, floorNodeId: "end_heartbreak", viz: "hearts" },
+  },
+  nodes: [
+    { id: "a", text: "a", choices: [
+      { label: "cook well", goto: "b", meterDeltas: { glomkleun: 1, huajai: 1 } },
+      { label: "slip modern", goto: "b", meterDeltas: { glomkleun: -3 } },
+      { label: "cold to him", goto: "b", meterDeltas: { huajai: -1 } },
+    ]},
+    { id: "b", text: "b", choices: [{ label: "end", goto: "end_good" }] },
+    { id: "end_good", text: "good", isEnding: true, endingId: "stay" },
+    { id: "end_exposed", text: "exposed", isEnding: true, endingId: "exposed" },
+    { id: "end_heartbreak", text: "heartbreak", isEnding: true, endingId: "heartbreak" },
+  ],
+};
+
+describe("initState: multi-meter", () => {
+  it("seeds every meter at its start (or max)", () => {
+    const s = initState(multiStory);
+    expect(s.meters).toEqual({ glomkleun: 3, huajai: 1 });
+    expect(s.meter).toBeUndefined();
+  });
+});
+
+describe("applyChoice: multi-meter", () => {
+  it("applies partial meterDeltas and clamps each meter", () => {
+    const { state } = applyChoice(multiStory, initState(multiStory), getNode(multiStory, "a").choices![0]);
+    expect(state.meters).toEqual({ glomkleun: 4, huajai: 2 });
+  });
+  it("forces the meter's own floor ending when it hits floor", () => {
+    const r = applyChoice(multiStory, initState(multiStory), getNode(multiStory, "a").choices![1]); // glomkleun 3-3=0
+    expect(r.forcedFloor).toBe(true);
+    expect(r.state.currentNode).toBe("end_exposed");
+  });
+  it("forces heartbreak when huajai hits floor", () => {
+    const r = applyChoice(multiStory, initState(multiStory), getNode(multiStory, "a").choices![2]); // huajai 1-1=0
+    expect(r.forcedFloor).toBe(true);
+    expect(r.state.currentNode).toBe("end_heartbreak");
+  });
+  it("checks glomkleun before huajai when both would floor", () => {
+    const story2: StoryData = {
+      ...multiStory,
+      nodes: [
+        { id: "a", text: "a", choices: [{ label: "both", goto: "b", meterDeltas: { glomkleun: -5, huajai: -5 } }] },
+        ...multiStory.nodes.slice(1),
+      ],
+    };
+    const r = applyChoice(story2, initState(story2), getNode(story2, "a").choices![0]);
+    expect(r.state.currentNode).toBe("end_exposed"); // glomkleun wins (insertion order)
+  });
+  it("isMultiMeter distinguishes the two shapes", () => {
+    expect(isMultiMeter(multiStory)).toBe(true);
+    expect(isMultiMeter(story)).toBe(false); // `story` = existing single-meter fixture
   });
 });

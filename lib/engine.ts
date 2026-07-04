@@ -9,7 +9,8 @@ export interface Choice {
   requires?: Record<string, boolean>;
   sets?: Record<string, boolean>;
   /** Change to the meter (-N..+N) when this choice is taken. */
-  meterDelta?: number;
+  meterDelta?: number;                  // single
+  meterDeltas?: Record<string, number>; // multi (partial — only changed meters)
 }
 
 export interface Chapter {
@@ -47,18 +48,24 @@ export interface Meter {
 export interface StoryData {
   schemaVersion: 1;
   start: string;
-  meter: Meter;
+  meter?: Meter;                        // single-meter stories
+  meters?: Record<string, Meter>;       // multi-meter stories (exactly one of meter/meters)
   nodes: StoryNode[];
 }
 
 export interface GameState {
   currentNode: string;
   flags: Flags;
-  meter: number;
+  meter?: number;                       // single
+  meters?: Record<string, number>;      // multi
 }
 
-export function clampMeter(value: number, story: StoryData): number {
-  return Math.max(story.meter.floor, Math.min(story.meter.max, value));
+export function isMultiMeter(story: StoryData): boolean {
+  return !!story.meters;
+}
+
+export function clampMeter(value: number, meter: Meter): number {
+  return Math.max(meter.floor, Math.min(meter.max, value));
 }
 
 export function buildNodeIndex(story: StoryData): Map<string, StoryNode> {
@@ -72,10 +79,17 @@ export function getNode(story: StoryData, nodeId: string): StoryNode {
 }
 
 export function initState(story: StoryData): GameState {
+  if (story.meters) {
+    const meters: Record<string, number> = {};
+    for (const [key, m] of Object.entries(story.meters)) {
+      meters[key] = m.start ?? m.max;
+    }
+    return { currentNode: story.start, flags: {}, meters };
+  }
   return {
     currentNode: story.start,
     flags: {},
-    meter: story.meter.start ?? story.meter.max,
+    meter: story.meter!.start ?? story.meter!.max,
   };
 }
 
@@ -101,12 +115,31 @@ export function applyChoice(story: StoryData, state: GameState, choice: Choice):
     throw new Error(`Choice "${choice.label}" is not available in current state`);
   }
   const nextFlags: Flags = { ...state.flags, ...(choice.sets ?? {}) };
-  const nextMeter = clampMeter(state.meter + (choice.meterDelta ?? 0), story);
 
+  if (story.meters) {
+    const nextMeters: Record<string, number> = {};
+    for (const [key, m] of Object.entries(story.meters)) {
+      const cur = state.meters?.[key] ?? m.start ?? m.max;
+      nextMeters[key] = clampMeter(cur + (choice.meterDeltas?.[key] ?? 0), m);
+    }
+    let nextNode = choice.goto;
+    let forcedFloor = false;
+    for (const [key, m] of Object.entries(story.meters)) {
+      if (nextMeters[key] <= m.floor && nextNode !== m.floorNodeId) {
+        nextNode = m.floorNodeId;
+        forcedFloor = true;
+        break;
+      }
+    }
+    return { state: { currentNode: nextNode, flags: nextFlags, meters: nextMeters }, forcedFloor };
+  }
+
+  const meter = story.meter!;
+  const nextMeter = clampMeter((state.meter ?? meter.start ?? meter.max) + (choice.meterDelta ?? 0), meter);
   let nextNode = choice.goto;
   let forcedFloor = false;
-  if (nextMeter <= story.meter.floor && nextNode !== story.meter.floorNodeId) {
-    nextNode = story.meter.floorNodeId;
+  if (nextMeter <= meter.floor && nextNode !== meter.floorNodeId) {
+    nextNode = meter.floorNodeId;
     forcedFloor = true;
   }
   return { state: { currentNode: nextNode, flags: nextFlags, meter: nextMeter }, forcedFloor };
