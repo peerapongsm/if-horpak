@@ -4,6 +4,7 @@
 import horpakJson from "../data/stories/horpak.json";
 import busJson from "../data/stories/bus.json";
 import faenPlomJson from "../data/stories/faen-plom.json";
+import borisatJson from "../data/stories/borisat.json";
 import type { StoryData } from "./engine";
 import type { EndingMeta } from "./endingsMeta";
 import type { AmbientMood } from "./ambient";
@@ -57,6 +58,20 @@ export const STORIES: StoryEntry[] = [
       { id: "grandma", title: "ยายเก็บความลับให้" },
       { id: "setup", title: "เขาวางแผนไว้แต่แรก", secret: true },
       { id: "broke", title: "แผนแตกกลางงาน" },
+    ],
+  },
+  {
+    slug: "borisat", title: "วันแรกที่บริษัทจำกัด",
+    tagline: "วันแรกในสตาร์ทอัพที่ทุกคนพูดภาษา synergy และเจ้านายเรียกทุกคนว่าแฟมิลี่",
+    genre: "เสียดสี", ambientMood: "office",
+    data: borisatJson as unknown as StoryData,
+    endings: [
+      { id: "become", title: "กลายเป็นสิ่งที่เคยเกลียด" },
+      { id: "quit", title: "ลาออกไปมีชีวิต" },
+      { id: "change", title: "เปลี่ยนจากข้างใน" },
+      { id: "survive", title: "เอาตัวรอดเงียบๆ" },
+      { id: "scheme", title: "บริษัทคือพีระมิด", secret: true },
+      { id: "burnout", title: "หมดไฟกลางวัน" },
     ],
   },
 ];
