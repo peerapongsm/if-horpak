@@ -149,15 +149,14 @@ export default function StoryPlayer({ slug }: { slug: string }) {
   const ending = isEndingNode(currentNode);
   const choices = availableChoices(currentNode, gameState.flags);
 
-  const ambientButton = (
-    <button type="button" className="text-btn" onClick={handleToggleAmbient} aria-pressed={ambientOn}>
-      {ambientOn ? "🔊 เสียงบรรยากาศ: เปิด" : "🔇 เสียงบรรยากาศ: ปิด"}
-    </button>
-  );
-
   return (
     <main className="screen">
       <div key={veilKey} className="scene-veil" aria-hidden="true" />
+      <nav className="top-nav">
+        <button type="button" className="nav-back" onClick={handleBackToStories}>
+          <span aria-hidden="true">←</span> เลือกเรื่อง
+        </button>
+      </nav>
       <div className="topbar">
         <p className="game-title">{entry.title}</p>
         {!ending && <MeterDisplay meter={entry.data.meter} value={gameState.meter} />}
@@ -185,15 +184,22 @@ export default function StoryPlayer({ slug }: { slug: string }) {
             {revealed && <ChoiceList choices={choices} onChoose={handleChoose} />}
           </div>
           <div className="footer-row">
-            <button type="button" className="text-btn" onClick={handleCycleSpeed}>
-              ⚙ ความเร็วตัวอักษร: {TEXT_SPEED_LABELS[speed]}
-            </button>
-            {ambientButton}
-            <button type="button" className="text-btn" onClick={handleBackToStories}>
-              เลือกเรื่อง
-            </button>
-            <button type="button" className="text-btn" onClick={handleRestart}>
-              เริ่มใหม่
+            <div className="control-cluster" role="group" aria-label="ตั้งค่าการอ่าน">
+              <button type="button" className="control-btn" onClick={handleCycleSpeed}>
+                ⚙ ความเร็ว: {TEXT_SPEED_LABELS[speed]}
+              </button>
+              <span className="control-sep" aria-hidden="true" />
+              <button
+                type="button"
+                className="control-btn"
+                onClick={handleToggleAmbient}
+                aria-pressed={ambientOn}
+              >
+                {ambientOn ? "🔊 เสียง: เปิด" : "🔇 เสียง: ปิด"}
+              </button>
+            </div>
+            <button type="button" className="restart-btn" onClick={handleRestart}>
+              <span aria-hidden="true">↺</span> เริ่มใหม่
             </button>
           </div>
         </>

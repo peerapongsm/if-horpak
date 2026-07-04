@@ -646,10 +646,98 @@ body::before {
 
 .footer-row {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   margin-top: 18px;
+}
+
+/* Top-left back nav — put "leave the story" at the opposite end of the screen
+   from the reading toggles so it can't be hit by accident. */
+.top-nav {
+  margin-bottom: 4px;
+}
+
+.nav-back {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 2px;
+  transition: color 0.15s ease;
+}
+
+.nav-back:hover,
+.nav-back:focus-visible {
+  color: var(--color-accent);
+  outline: none;
+}
+
+/* Reading toggles you touch mid-story, bound together as one settings unit so
+   they read as a group distinct from the destructive action beside them. */
+.control-cluster {
+  display: flex;
+  align-items: stretch;
+  background: var(--chip-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.control-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.control-btn:hover,
+.control-btn:focus-visible {
+  color: var(--color-accent);
+  background: var(--chip-bg-strong);
+  outline: none;
+}
+
+.control-sep {
+  width: 1px;
+  background: var(--color-border);
+  align-self: stretch;
+}
+
+/* Destructive "start over" — quiet at rest, caution-red on intent, and pushed
+   to the far edge (space-between) so reaching for speed/sound never lands here.
+   It stays confirm-gated in code as a second safety net. */
+.restart-btn {
+  appearance: none;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--color-text-dim);
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 8px 16px;
+  margin-left: auto;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.restart-btn:hover,
+.restart-btn:focus-visible {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  outline: none;
 }
 
 /* --- story-select screen --- */
