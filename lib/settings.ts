@@ -27,7 +27,7 @@ export interface StorageLike {
   setItem(key: string, value: string): void;
 }
 
-const SPEED_KEY = "if-horpak:text-speed:v1";
+const SPEED_KEY = "if:text-speed:v1";
 
 export function getTextSpeed(storage: StorageLike): TextSpeed {
   const raw = storage.getItem(SPEED_KEY);

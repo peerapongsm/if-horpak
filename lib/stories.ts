@@ -5,21 +5,23 @@ import horpakJson from "../data/stories/horpak.json";
 import busJson from "../data/stories/bus.json";
 import type { StoryData } from "./engine";
 import type { EndingMeta } from "./endingsMeta";
+import type { AmbientMood } from "./ambient";
 
 export interface StoryEntry {
-  /** Also the localStorage namespace — never change once shipped. */
-  slug: string;
+  slug: string;            // also localStorage namespace + route — never change once shipped
   title: string;
   tagline: string;
+  genre: string;           // card tag, e.g. "สยองขวัญ"
+  ambientMood: AmbientMood;
   data: StoryData;
   endings: EndingMeta[];
 }
 
 export const STORIES: StoryEntry[] = [
   {
-    slug: "horpak",
-    title: "หนึ่งคืนที่หอพัก",
+    slug: "horpak", title: "หนึ่งคืนที่หอพัก",
     tagline: "เสียงเคาะประตูตอนตีสาม ในหอที่ควรจะว่างทั้งชั้น",
+    genre: "สยองขวัญ", ambientMood: "horror",
     data: horpakJson as unknown as StoryData,
     endings: [
       { id: "death", title: "ตาย" },
@@ -30,9 +32,9 @@ export const STORIES: StoryEntry[] = [
     ],
   },
   {
-    slug: "bus",
-    title: "รถเมล์สายสุดท้าย",
+    slug: "bus", title: "รถเมล์สายสุดท้าย",
     tagline: "รถเมล์ครีมแดงไม่มีเลขสาย ที่จอดรับเฉพาะคนยังไม่ยอมกลับบ้าน",
+    genre: "สยองขวัญ", ambientMood: "horror",
     data: busJson as unknown as StoryData,
     endings: [
       { id: "death", title: "จมไปกับรถ" },
